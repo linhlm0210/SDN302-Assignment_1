@@ -10,9 +10,10 @@ import { engine } from "express-handlebars";
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.engine("hbs", engine({ extname: "hbs" }));
 app.set("view engine", "hbs");
-app.set("views", "./resources/views");
+app.set("views", "./views");
 
 dotenv.config();
 

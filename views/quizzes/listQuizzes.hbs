@@ -1,0 +1,36 @@
+<div class="wrap">
+    <h1>Quizzes list</h1><br>
+    <p><a href="/quizzes/create">Add quizz</a></p><br>
+    <table class="table tab_wid">
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">ID</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+    </thead>
+    <tbody>
+            {{#each quiz}}
+                <tr>
+                    <td>{{this.title}}</td>
+                    <td>{{this.description}}</td>
+                    <td>{{this._id}}</td>
+                    <td>
+                        <a href="/quizzes/{{this._id}}/populate">Detail</a>
+                    </td>
+                    <td>
+                        <a href="/quizzes/{{this._id}}/update" class="btn btn-link">Update</a>
+                    </td>
+                    <td>
+                        <form action="/quizzes/delete/{{this._id}}" method="post">
+                            <button type="submit" class="btn btn-link delButt">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+

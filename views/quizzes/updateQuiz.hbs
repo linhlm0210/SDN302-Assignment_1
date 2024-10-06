@@ -1,0 +1,56 @@
+<div class="wrap">
+    <h1>Update Quiz</h1><br>
+    <form action="/quizzes/{{id}}/update" method="POST">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="{{quiz.title}}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" required>{{quiz.description}}</textarea>
+        </div>
+
+        <h2>Questions</h2>
+        {{#each quiz.questions}}
+    <div class="question">
+        <h3>Question {{@index}}</h3>
+        
+        <div class="form-group">
+            <label for="questionText_{{@index}}">Question Text</label>
+            <input type="text" id="questionText_{{@index}}" name="questions[{{@index}}].text" value="{{this.text}}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Options</label>
+            <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[0]}}" required>
+            {{#if this.options.[1]}}
+                <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[1]}}">
+            {{/if}}
+            {{#if this.options.[2]}}
+                <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[2]}}">
+            {{/if}}
+            {{#if this.options.[3]}}
+                <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[3]}}">
+            {{/if}}
+        </div>
+
+        <div class="form-group">
+            <label for="keywords_{{@index}}">Keywords</label>
+            <input type="text" id="keywords_{{@index}}" name="questions[{{@index}}].keywords" value="{{this.keywords}}">
+        </div>
+
+        <div class="form-group">
+            <label for="correctAnswerIndex_{{@index}}">Correct Answer Index</label>
+            <input type="number" id="correctAnswerIndex_{{@index}}" name="questions[{{@index}}].correctAnswerIndex" value="{{this.correctAnswerIndex}}" min="0" required>
+        </div>
+
+        <hr>
+    </div>
+{{/each}}
+
+
+
+        <button type="submit">Update Quiz</button>
+    </form>
+</div>

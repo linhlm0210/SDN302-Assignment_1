@@ -1,0 +1,28 @@
+<div class="wrap">
+    <h1>Quiz Detail</h1><br>
+    <table class="table tab_wid">
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Questions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{quiz.title}}</td>
+                <td>{{quiz.description}}</td>
+                <td>
+                    <ul>
+                        {{#each quiz.questions}}
+                            <li>{{this.text}}</li>
+                            <li>{{this.options}}</li>
+                            <li>{{this.keywords}}</li>
+                            <li>{{this.correctAnswerIndex}}</li>
+                        {{/each}}
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

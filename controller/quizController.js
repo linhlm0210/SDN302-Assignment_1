@@ -11,20 +11,37 @@ export const create = async (req, res) => {
       return res.status(400).json({ message: "Quiz already exist." });
     }
     const savedQuiz = await quizData.save();
-    res.status(201).json(savedQuiz);
+    res.status(201)
+    // .json(savedQuiz)
+    .redirect('get');
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error. " });
   }
 };
 
+// get create form
+
+export const createForm = async (req, res) => {
+  try {
+    console.log("get create form");
+    res.render("quizzes/createQuiz");
+  } catch (error) {
+    console.log("Internal Server Error. ");
+    res.status(500).json({ error: "Internal Server Error. " });
+  }
+}
+
 // For getting all users from database
 export const fetch = async (req, res) => {
   try {
-    const quiz = await Quiz.find();
+    const quiz = await Quiz.find().lean();
     if (quiz.length === 0) {
       return res.status(404).json({ message: "Quiz not Found." });
     }
-    res.status(200).json(quiz);
+    // res.status(200).json(quiz);
+    res.render("quizzes/listQuizzes", {
+      quiz: quiz
+  });
   } catch (error) {
     res.status(500).json({ error: " Internal Server Error. " });
   }
@@ -35,11 +52,14 @@ export const getQuizById = async (req, res) => {
   try {
     const id = req.params.id;
     // console.log(id);
-    const quizExist = await Quiz.findById(id).populate("questions");
+    const quizExist = await Quiz.findById(id).populate("questions").lean();;
     if (!quizExist) {
       return res.status(404).json({ message: "Quiz not Found." });
     }
-    return res.status(200).json(quizExist);
+    // return res.status(200).json(quizExist);
+    res.render("quizzes/viewQuiz", {
+      quiz: quizExist
+  });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error. " });
   }
@@ -60,34 +80,89 @@ export const getQuizById = async (req, res) => {
 // }
 // For updating data
 
+// export const update = async (req, res) => {
+//   try {
+//     // console.log('Updating  Question    ');
+//     const id = req.params.id;
+//     const quizExist = await Quiz.findOne({ _id: id });
+//     if (!quizExist) {
+//       return res.status(404).json({ message: "Quiz not found." });
+//     }
+//     // console.log(req.body);
+//     const updateQuiz = await Quiz.findByIdAndUpdate(id, req.body, {
+//       new: true,
+//     });
+//     return res.status(201).json(updateQuiz);
+//   } catch (error) {
+//     res.status(500).json({ error: " Internal Server Error. " });
+//   }
+// };
+
+export const getUpdateForm = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const quiz = await Quiz.findById(id).lean();
+    if (!quiz) {
+      return res.status(404).json({ message: "Quiz not found." });
+    }
+    res.render("quizzes/updateQuiz", { quiz, id }); // Pass the quiz data to the update form
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error." });
+  }
+};
+
 export const update = async (req, res) => {
   try {
-    // console.log('Updating  Question    ');
     const id = req.params.id;
-    const quizExist = await Quiz.findOne({ _id: id });
+    const quizExist = await Quiz.findById(id).populate("questions").lean();
     if (!quizExist) {
       return res.status(404).json({ message: "Quiz not found." });
     }
-    // console.log(req.body);
-    const updateQuiz = await Quiz.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    return res.status(201).json(updateQuiz);
+
+    // Update quiz details
+    quizExist.title = req.body.title;
+    quizExist.description = req.body.description;
+
+    // Check for questions update
+    if (req.body.questions) {
+      quizExist.questions = await Promise.all(req.body.questions.map((question) => {
+        return {
+          text: question.text,
+          options: question.options || [], // Đảm bảo options là mảng
+          keywords: question.keywords,
+          correctAnswerIndex: question.correctAnswerIndex
+        };
+      }));
+    }
+
+    const updatedQuiz = await Quiz.findByIdAndUpdate(id, {
+      title: quizExist.title,
+      description: quizExist.description,
+      questions: quizExist.questions
+    }, { new: true });
+
+    res.redirect('/quizzes/get'); // Redirect after successful update
   } catch (error) {
-    res.status(500).json({ error: " Internal Server Error. " });
+    console.error(error); // Log error for debugging
+    res.status(500).json({ error: "Internal Server Error." });
   }
 };
+
+
+
 // For deleting data from database
 export const deleteQuiz = async (req, res) => {
   try {
     const id = req.params.id || req.query.id;
     console.log(id);
+    
     const quizExist = await Quiz.findOne({ _id: id });
     if (!quizExist) {
       return res.status(404).json({ message: " Quiz Not Found. " });
     }
     await Quiz.findByIdAndDelete(id);
-    res.status(201).json({ message: " Quiz deleted Successfully." });
+    // res.status(201).json({ message: " Quiz deleted Successfully." });
+    res.redirect('/quizzes/get');
   } catch (error) {
     res.status(500).json({ error: " Internal Server Error. " });
   }
