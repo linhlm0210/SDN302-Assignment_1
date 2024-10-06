@@ -32,11 +32,17 @@
           </div>
 
           <div id="optionsContainer">
-            <div class="form-group mb-3">
+            <div class="form-group mb-3 position-relative">
               <label for="option1" class="form-label">Option 1</label>
-              <input type="text" id="option1" name="options" class="form-control" placeholder="Enter option 1" required />
+              <div class="input-group">
+                <input type="text" id="option1" name="options" class="form-control option-input" placeholder="Enter option 1" required />
+                <span class="input-group-text">
+                  <i class="fa fa-trash text-danger remove-option" style="cursor: pointer;"></i>
+                </span>
+              </div>
             </div>
           </div>
+
           <div class="d-grid gap-2 col-6 mx-auto">
             <button class="btn btn-outline-success" id="addOptionBtn" type="button">Add Option</button>
           </div>
@@ -65,12 +71,27 @@
 
     // Tạo một trường input mới cho option
     const newOptionDiv = document.createElement('div');
-    newOptionDiv.className = 'form-group mb-3';
+    newOptionDiv.className = 'form-group mb-3 position-relative';
     newOptionDiv.innerHTML = `
-      <label for="option${optionCount}" class="form-label">Option ${optionCount}</label>
-      <input type="text" id="option${optionCount}" name="options" class="form-control" placeholder="Enter option ${optionCount}" required />
+       <div class="form-group mb-3 position-relative">
+              <label for="option${optionCount}" class="form-label">Option ${optionCount}</label>
+              <div class="input-group">
+                <input type="text" id="option${optionCount}" name="options" class="form-control option-input" placeholder="Enter option ${optionCount}" required />
+                <span class="input-group-text">
+                  <i class="fa fa-trash text-danger remove-option" style="cursor: pointer;" data-index="${optionCount}"></i>
+                </span>
+              </div>
+            </div>
     `;
     
     optionsContainer.appendChild(newOptionDiv);
+  });
+
+  // Remove option
+  document.getElementById('optionsContainer').addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-option')) {
+      const optionItem = e.target.closest('.form-group');
+      optionItem.remove();
+    }
   });
 </script>
