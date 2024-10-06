@@ -1,0 +1,57 @@
+<h1 class="text-center">Questions list</h1><br />
+<div class="d-grid gap-2 col-6 mx-auto">
+  <button class="btn btn-outline-success" type="button">
+    <a
+      class="link-success"
+      href="/questions/create"
+      style="text-decoration:none;"
+    >Add question</a>
+  </button>
+</div>
+<div class="d-flex justify-content-center">
+
+  <div class="col-6" style="margin: 20px">
+    {{#each question}}
+      <div class="card mb-4" style="width: 100%;">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <span>{{this.text}}</span>
+          {{!-- <div>
+            <button type="submit" class="btn btn-link delButt"><a
+              href="/questions/{{this._id}}/update"
+              class="text-decoration-none me-2"
+              title="Edit"
+            >
+              <i class="fas fa-edit"></i>
+              <!-- Icon Edit -->
+            </a></button>
+            <form action="/questions/{{this._id}}/delete" method="post">
+              <button type="submit" class="btn btn-link delButt"><i class="fas fa-trash-alt"></i></button>
+            </form>
+          </div> --}}
+          <div>
+            <!-- Update quiz icon -->
+            <a href="/questions/{{this._id}}/update" class="btn btn-outline-primary btn-sm" title="Update question">
+              <i class="fas fa-edit"></i>
+            </a>
+            <!-- Delete quiz icon -->
+            <form action="/questions/{{this._id}}/delete" method="POST" style="display:inline;">
+              <button class="btn btn-outline-danger btn-sm" type="submit" title="Delete question" onclick="return ">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        <ul class="list-group list-group-flush">
+          {{#each this.options}}
+            <li class="list-group-item">{{this}}</li>
+          {{/each}}
+          <li class="list-group-item">Correct answer:
+            {{this.options.[this.correctAnswerIndex]}}</li>
+          <li class="list-group-item">Keywords: {{this.keywords}}</li>
+        </ul>
+      </div>
+    {{/each}}
+  </div>
+</div>

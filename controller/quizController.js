@@ -1,6 +1,40 @@
 import Quiz from "../model/quizModel.js";
 import Question from "../model/questionModel.js";
 
+
+// For updating a specific question in a Quiz
+export const updateAQuestionInQuiz = async (req, res) => {
+  try {
+    const idQuiz = req.params.id; // ID của quiz
+    const idQuestion = req.params.questionId; // ID của câu hỏi
+
+    // Tìm quiz theo ID
+    const quizExist = await Quiz.findById(idQuiz).populate('questions');
+    if (!quizExist) {
+      return res.status(404).json({ message: "Quiz not found." });
+    }
+
+    // Tìm câu hỏi theo ID
+    const questionExist = await Question.findById(idQuestion);
+    if (!questionExist) {
+      return res.status(404).json({ message: "Question not found." });
+    }
+
+    // Cập nhật các thuộc tính của câu hỏi
+    questionExist.text = req.body.text || questionExist.text;
+    questionExist.options = req.body.options || questionExist.options;
+    questionExist.keywords = req.body.keywords || questionExist.keywords;
+    questionExist.correctAnswerIndex = req.body.correctAnswerIndex !== undefined ? req.body.correctAnswerIndex : questionExist.correctAnswerIndex;
+
+    // Lưu câu hỏi đã cập nhật
+    await questionExist.save();
+
+    res.status(200).json({ message: "Question updated successfully.", question: questionExist });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error." });
+  }
+};
+
 // For posting data into database
 export const create = async (req, res) => {
   try {
@@ -13,7 +47,7 @@ export const create = async (req, res) => {
     const savedQuiz = await quizData.save();
     res.status(201)
     // .json(savedQuiz)
-    .redirect('get');
+    .redirect('/quizzes');
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error. " });
   }
@@ -51,7 +85,6 @@ export const fetch = async (req, res) => {
 export const getQuizById = async (req, res) => {
   try {
     const id = req.params.id;
-    // console.log(id);
     const quizExist = await Quiz.findById(id).populate("questions").lean();;
     if (!quizExist) {
       return res.status(404).json({ message: "Quiz not Found." });
@@ -80,23 +113,23 @@ export const getQuizById = async (req, res) => {
 // }
 // For updating data
 
-// export const update = async (req, res) => {
-//   try {
-//     // console.log('Updating  Question    ');
-//     const id = req.params.id;
-//     const quizExist = await Quiz.findOne({ _id: id });
-//     if (!quizExist) {
-//       return res.status(404).json({ message: "Quiz not found." });
-//     }
-//     // console.log(req.body);
-//     const updateQuiz = await Quiz.findByIdAndUpdate(id, req.body, {
-//       new: true,
-//     });
-//     return res.status(201).json(updateQuiz);
-//   } catch (error) {
-//     res.status(500).json({ error: " Internal Server Error. " });
-//   }
-// };
+export const update = async (req, res) => {
+  try {
+    // console.log('Updating  Question    ');
+    const id = req.params.id;
+    const quizExist = await Quiz.findOne({ _id: id });
+    if (!quizExist) {
+      return res.status(404).json({ message: "Quiz not found." });
+    }
+    // console.log(req.body);
+    const updateQuiz = await Quiz.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    return res.status(201).json(updateQuiz);
+  } catch (error) {
+    res.status(500).json({ error: " Internal Server Error. " });
+  }
+};
 
 export const getUpdateForm = async (req, res) => {
   try {
@@ -111,45 +144,6 @@ export const getUpdateForm = async (req, res) => {
   }
 };
 
-export const update = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const quizExist = await Quiz.findById(id).populate("questions").lean();
-    if (!quizExist) {
-      return res.status(404).json({ message: "Quiz not found." });
-    }
-
-    // Update quiz details
-    quizExist.title = req.body.title;
-    quizExist.description = req.body.description;
-
-    // Check for questions update
-    if (req.body.questions) {
-      quizExist.questions = await Promise.all(req.body.questions.map((question) => {
-        return {
-          text: question.text,
-          options: question.options || [], // Đảm bảo options là mảng
-          keywords: question.keywords,
-          correctAnswerIndex: question.correctAnswerIndex
-        };
-      }));
-    }
-
-    const updatedQuiz = await Quiz.findByIdAndUpdate(id, {
-      title: quizExist.title,
-      description: quizExist.description,
-      questions: quizExist.questions
-    }, { new: true });
-
-    res.redirect('/quizzes/get'); // Redirect after successful update
-  } catch (error) {
-    console.error(error); // Log error for debugging
-    res.status(500).json({ error: "Internal Server Error." });
-  }
-};
-
-
-
 // For deleting data from database
 export const deleteQuiz = async (req, res) => {
   try {
@@ -162,7 +156,7 @@ export const deleteQuiz = async (req, res) => {
     }
     await Quiz.findByIdAndDelete(id);
     // res.status(201).json({ message: " Quiz deleted Successfully." });
-    res.redirect('/quizzes/get');
+    res.redirect('/quizzes');
   } catch (error) {
     res.status(500).json({ error: " Internal Server Error. " });
   }
@@ -189,7 +183,10 @@ export const createQuizQuestion = async (req, res) => {
     const savedQuestion = await questionData.save();
     quizExist.questions.push(savedQuestion._id);
     await quizExist.save();
-    res.status(201).json(savedQuestion);
+    // res.status(201).json(savedQuestion);
+    res.status(201)
+    // .json(savedQuiz)
+    .redirect('/quizzes/' + idQuiz + '/populate' );
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error. " });
   }

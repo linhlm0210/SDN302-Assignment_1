@@ -11,10 +11,10 @@ const questionSchema = new mongoose.Schema({
   },
   keywords: {
     type: String,
-    required: false,
+    required: true,
   },
   correctAnswerIndex: {
-    type: String,
+    type: Number,
     required: true,
   },
 });

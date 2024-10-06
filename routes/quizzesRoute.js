@@ -25,7 +25,7 @@ route.post("/:id/questions", createQuizQuestions);
 route.get("/:id/update", getUpdateForm);
 route.post("/:id/update", update);
 
-route.post("/delete/:id", deleteQuiz);
+route.post("/:id/delete", deleteQuiz);
 route.delete("/delete", deleteQuiz);
 
 export default route;

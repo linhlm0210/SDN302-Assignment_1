@@ -1,0 +1,76 @@
+<div class="wrap">
+  <h1 class="text-center">{{quiz.title}}</h1><br />
+  <h5 class="text-center">{{quiz.description}}</h5><br />
+
+  <div class="d-flex justify-content-center">
+    <div class="col-6">
+      {{#each quiz.questions}}
+        <div class="card mb-4" style="width: 100%;">
+          <div class="card-header">
+            {{this.text}}
+          </div>
+          <ul class="list-group list-group-flush">
+            {{#each this.options}}
+              <li class="list-group-item">{{this}}</li>
+            {{/each}}
+            <li class="list-group-item">Correct answer: {{this.options.[this.correctAnswerIndex]}}</li>
+            <li class="list-group-item">Keywords: {{this.keywords}}</li>
+          </ul>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <div id="addQuizForm" class="mt-4">
+    <h5 class="text-center">Add New Question</h5>
+    <div class="container mt-5">
+      <div class="panel-body">
+        <form action="/questions/create" method="post" class="form-card">
+          <div class="form-group mb-3">
+            <label for="questionText" class="form-label">Question Text</label>
+            <input type="text" id="questionText" name="text" class="form-control" placeholder="Enter question text" required />
+          </div>
+
+          <div id="optionsContainer">
+            <div class="form-group mb-3">
+              <label for="option1" class="form-label">Option 1</label>
+              <input type="text" id="option1" name="options" class="form-control" placeholder="Enter option 1" required />
+            </div>
+          </div>
+          <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-outline-success" id="addOptionBtn" type="button">Add Option</button>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="correctAnswerIndex" class="form-label">Correct Answer Index</label>
+            <input type="number" id="correctAnswerIndex" name="correctAnswerIndex" class="form-control" min="0" max="3" required />
+          </div>
+          <div class="form-group mb-3">
+            <label for="keywords" class="form-label">Keywords</label>
+            <input type="text" id="keywords" name="keywords" class="form-control" placeholder="Enter keywords" required />
+          </div>
+          <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-outline-success" type="submit">Submit Question</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('addOptionBtn').addEventListener('click', function() {
+    const optionsContainer = document.getElementById('optionsContainer');
+    const optionCount = optionsContainer.children.length + 1; // Tính số lượng option hiện có
+
+    // Tạo một trường input mới cho option
+    const newOptionDiv = document.createElement('div');
+    newOptionDiv.className = 'form-group mb-3';
+    newOptionDiv.innerHTML = `
+      <label for="option${optionCount}" class="form-label">Option ${optionCount}</label>
+      <input type="text" id="option${optionCount}" name="options" class="form-control" placeholder="Enter option ${optionCount}" required />
+    `;
+    
+    optionsContainer.appendChild(newOptionDiv);
+  });
+</script>

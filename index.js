@@ -31,4 +31,4 @@ mongoose
   .catch((error) => console.log(error));
 
 app.use("/quizzes", quizzesRoute);
-app.use("/question", questionRoute);
+app.use("/questions", questionRoute);
