@@ -1,56 +1,147 @@
 <div class="wrap">
-    <h1>Update Quiz</h1><br>
-    <form action="/quizzes/{{id}}/update" method="POST">
-        <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" value="{{quiz.title}}" required>
+  <h1 class="text-center">Update Quiz</h1><br />
+  <div class="container mt-5">
+    <div class="panel-body">
+      <form id="updateQuizForm" class="form-card">
+        <div class="form-group mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" id="title" name="title" class="form-control" value="{{quiz.title}}" required />
         </div>
         
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description" required>{{quiz.description}}</textarea>
+        <div class="form-group mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea id="description" name="description" class="form-control" required>{{quiz.description}}</textarea>
         </div>
 
-        <h2>Questions</h2>
-        {{#each quiz.questions}}
-    <div class="question">
-        <h3>Question {{@index}}</h3>
-        
-        <div class="form-group">
-            <label for="questionText_{{@index}}">Question Text</label>
-            <input type="text" id="questionText_{{@index}}" name="questions[{{@index}}].text" value="{{this.text}}" required>
+        <h2 class="text-center">Questions</h2>
+        <div id="questionsContainer">
+          {{#each quiz.questions}}
+            <div class="question card mb-4" data-question-id="{{this._id}}">
+              <input type="hidden" name="questions[]" value="{{this._id}}">
+              <div class="card-header">
+                <h3>
+                  <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#question_{{@index}}" aria-expanded="false" aria-controls="question_{{@index}}">
+                    Question {{@index}}: {{this.text}}
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm float-end" onclick='removeQuestion("{{this._id}}")'>Remove</button>
+                  <a href="/questions/{{this._id}}/update" class="btn btn-primary btn-sm float-end me-2">Edit</a>
+                </h3>
+              </div>
+            </div>
+          {{/each}}
         </div>
 
-        <div class="form-group">
-            <label>Options</label>
-            <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[0]}}" required>
-            {{#if this.options.[1]}}
-                <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[1]}}">
-            {{/if}}
-            {{#if this.options.[2]}}
-                <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[2]}}">
-            {{/if}}
-            {{#if this.options.[3]}}
-                <input type="text" name="questions[{{@index}}].options[]" value="{{this.options.[3]}}">
-            {{/if}}
+        <h2 class="text-center">Search Questions</h2>
+        <div class="form-group mb-3">
+          <input type="text" id="searchQuery" class="form-control" placeholder="Search questions...">
+          <button type="button" id="searchBtn" class="btn btn-outline-primary mt-2">Search</button>
         </div>
+        <div id="searchResults" class="mb-4"></div>
 
-        <div class="form-group">
-            <label for="keywords_{{@index}}">Keywords</label>
-            <input type="text" id="keywords_{{@index}}" name="questions[{{@index}}].keywords" value="{{this.keywords}}">
+        <div class="d-grid gap-2 col-6 mx-auto">
+          <button type="button" id="updateQuizBtn" class="btn btn-outline-success">Update Quiz</button>
         </div>
-
-        <div class="form-group">
-            <label for="correctAnswerIndex_{{@index}}">Correct Answer Index</label>
-            <input type="number" id="correctAnswerIndex_{{@index}}" name="questions[{{@index}}].correctAnswerIndex" value="{{this.correctAnswerIndex}}" min="0" required>
-        </div>
-
-        <hr>
+      </form>
     </div>
-{{/each}}
-
-
-
-        <button type="submit">Update Quiz</button>
-    </form>
+  </div>
 </div>
+
+<!-- Include Bootstrap JS for collapse functionality -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+
+<script>
+  document.getElementById('searchBtn').addEventListener('click', async function() {
+    const query = document.getElementById('searchQuery').value;
+    const response = await fetch(`/quizzes/questions/search?query=${query}`);
+    const questions = await response.json();
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '';
+
+    const existingQuestionIds = Array.from(document.querySelectorAll('#questionsContainer .question')).map(q => q.getAttribute('data-question-id'));
+
+    questions.forEach((question, index) => {
+      if (!existingQuestionIds.includes(question._id)) {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question card mb-2';
+        questionDiv.innerHTML = `
+          <div class="card-body">
+            <p>${question.text}</p>
+            <button type="button" class="btn btn-outline-primary" data-question-id="${question._id}" data-question-text="${question.text}" onclick='selectQuestion("${question._id}")'>Select</button>
+          </div>
+        `;
+        searchResults.appendChild(questionDiv);
+      }
+    });
+  });
+
+  function selectQuestion(id) {
+    const button = document.querySelector(`button[data-question-id="${id}"]`);
+    const text = button.getAttribute('data-question-text');
+
+    const questionsContainer = document.getElementById('questionsContainer');
+    if (!questionsContainer) {
+      console.error('Questions container not found');
+      return;
+    }
+
+    const index = questionsContainer.children.length;
+
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question card mb-4';
+    questionDiv.setAttribute('data-question-id', id);
+    questionDiv.innerHTML = `
+      <input type="hidden" name="questions[]" value="${id}">
+      <div class="card-header">
+        <h3>
+          <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#question_${index}" aria-expanded="false" aria-controls="question_${index}">
+            Question ${index}: ${text}
+          </button>
+          <button type="button" class="btn btn-danger btn-sm float-end" onclick='removeQuestion("${id}")'>Remove</button>
+          <a href="/questions/${id}/update" class="btn btn-primary btn-sm float-end me-2">Edit</a>
+        </h3>
+      </div>
+    `;
+    questionsContainer.appendChild(questionDiv);
+
+    // Remove the question from search results
+    const searchResults = document.getElementById('searchResults');
+    const questionToRemove = button.parentElement.parentElement;
+    searchResults.removeChild(questionToRemove);
+  }
+
+  function removeQuestion(id) {
+    const questionDiv = document.querySelector(`div[data-question-id="${id}"]`);
+    if (questionDiv) {
+      questionDiv.remove();
+    }
+  }
+
+  document.getElementById('updateQuizBtn').addEventListener('click', async function() {
+    const form = document.getElementById('updateQuizForm');
+    const formData = new FormData(form);
+    const quizData = Object.fromEntries(formData.entries());
+    quizData.questions = formData.getAll('questions[]'); // Get all question IDs
+    const id = "{{id}}"; // Use the quiz ID from the template
+
+    try {
+      const response = await fetch(`/quizzes/${id}/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(quizData)
+      });
+
+      if (response.ok) {
+        alert('Quiz updated successfully.');
+        window.location.href = '/quizzes';
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message}`);
+      }
+    } catch (error) {
+      alert('Internal Server Error.');
+    }
+  });
+</script>

@@ -9,6 +9,7 @@ import {
   getQuizById,
   createQuizQuestion,
   createQuizQuestions,
+  searchQuestions
 } from "../controller/quizController.js";
 
 const route = express.Router();
@@ -27,5 +28,7 @@ route.post("/:id/update", update);
 
 route.post("/:id/delete", deleteQuiz);
 route.delete("/delete", deleteQuiz);
+
+route.get("/questions/search", searchQuestions); // Add this line
 
 export default route;

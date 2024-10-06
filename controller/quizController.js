@@ -115,26 +115,33 @@ export const getQuizById = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    // console.log('Updating  Question    ');
     const id = req.params.id;
-    const quizExist = await Quiz.findOne({ _id: id });
+    const quizExist = await Quiz.findById(id);
     if (!quizExist) {
       return res.status(404).json({ message: "Quiz not found." });
     }
-    // console.log(req.body);
-    const updateQuiz = await Quiz.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    return res.status(201).json(updateQuiz);
+
+    // Update quiz fields
+    quizExist.title = req.body.title || quizExist.title;
+    quizExist.description = req.body.description || quizExist.description;
+
+    // Update questions
+    if (req.body.questions) {
+      quizExist.questions = req.body.questions;
+    }
+
+    // Save the updated quiz
+    const updatedQuiz = await quizExist.save();
+    return res.status(201).json(updatedQuiz);
   } catch (error) {
-    res.status(500).json({ error: " Internal Server Error. " });
+    res.status(500).json({ error: "Internal Server Error." });
   }
 };
 
 export const getUpdateForm = async (req, res) => {
   try {
     const id = req.params.id;
-    const quiz = await Quiz.findById(id).lean();
+    const quiz = await Quiz.findById(id).populate('questions').lean();
     if (!quiz) {
       return res.status(404).json({ message: "Quiz not found." });
     }
@@ -222,6 +229,16 @@ export const createQuizQuestions = async (req, res) => {
       await quizExist.save();
       
       res.status(201).json({ message: "Questions added successfully." });
+    } catch (error) {
+      res.status(500).json({ error: "Internal Server Error." });
+    }
+  };
+
+  export const searchQuestions = async (req, res) => {
+    try {
+      const query = req.query.query;
+      const questions = await Question.find({ text: new RegExp(query, 'i') }).lean();
+      res.json(questions);
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error." });
     }

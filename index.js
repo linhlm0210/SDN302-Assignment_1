@@ -30,5 +30,10 @@ mongoose
   })
   .catch((error) => console.log(error));
 
+// Home route
+app.get("/", (req, res) => {
+  res.render("home");
+});
+
 app.use("/quizzes", quizzesRoute);
 app.use("/questions", questionRoute);

@@ -47,8 +47,10 @@
           {{#each this.options}}
             <li class="list-group-item">{{this}}</li>
           {{/each}}
-          <li class="list-group-item">Correct answer:
-            {{this.options.[this.correctAnswerIndex]}}</li>
+          <li class="list-group-item">
+            Correct answer:
+            {{this.correctAnswer}}
+            </li>
           <li class="list-group-item">Keywords: {{this.keywords}}</li>
         </ul>
       </div>

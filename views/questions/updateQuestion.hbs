@@ -1,39 +1,38 @@
-<h1 class="text-center">Update Question</h1>
-<div class="container mt-5">
-  <div class="panel-body">
-    <form action="/questions/{{question._id}}/update" method="post" class="form-card">
-      <div class="form-group mb-3">
-        <label for="questionText" class="form-label">Question Text</label>
-        <input type="text" id="questionText" name="text" class="form-control" placeholder="Enter question text" value="{{question.text}}" required />
-      </div>
+<div class="wrap">
+  <h1 class="text-center">Update Question</h1><br />
+  <div class="container mt-5">
+    <div class="panel-body">
+      <form action="/questions/{{question._id}}/update" method="post" class="form-card">
+        <div class="form-group mb-3">
+          <label for="questionText" class="form-label">Question Text</label>
+          <input type="text" id="questionText" name="text" class="form-control" value="{{question.text}}" required />
+        </div>
 
-      <div id="optionsContainer">
-        {{#each question.options}}
-          <div class="form-group mb-3">
-            <label for="option{{@index}}" class="form-label">Option {{@index}}</label>
-            <input type="text" id="option{{@index}}" name="options" class="form-control" placeholder="Enter option {{@index}}" value="{{this}}" required />
-          </div>
-        {{/each}}
-      </div>
+        <div id="optionsContainer">
+          {{#each question.options}}
+            <div class="form-group mb-3">
+              <label for="option{{@index}}" class="form-label">Option {{@index}}</label>
+              <input type="text" id="option{{@index}}" name="options" class="form-control" value="{{this}}" required />
+            </div>
+          {{/each}}
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+          <button class="btn btn-outline-success" id="addOptionBtn" type="button">Add Option</button>
+        </div>
 
-      <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-outline-success" id="addOptionBtn" type="button">Add Option</button>
-      </div>
-
-      <div class="form-group mb-3">
-        <label for="correctAnswerIndex" class="form-label">Correct Answer Index</label>
-        <input type="number" id="correctAnswerIndex" name="correctAnswerIndex" class="form-control" min="0" max="{{question.options.length}}" value="{{question.correctAnswerIndex}}" required />
-      </div>
-
-      <div class="form-group mb-3">
-        <label for="keywords" class="form-label">Keywords</label>
-        <input type="text" id="keywords" name="keywords" class="form-control" placeholder="Enter keywords" value="{{question.keywords}}" required />
-      </div>
-
-      <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-outline-success" type="submit">Update Question</button>
-      </div>
-    </form>
+        <div class="form-group mb-3">
+          <label for="correctAnswerIndex" class="form-label">Correct Answer Index</label>
+          <input type="number" id="correctAnswerIndex" name="correctAnswerIndex" class="form-control" value="{{question.correctAnswerIndex}}" min="0" required />
+        </div>
+        <div class="form-group mb-3">
+          <label for="keywords" class="form-label">Keywords</label>
+          <input type="text" id="keywords" name="keywords" class="form-control" value="{{question.keywords}}" required />
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+          <button class="btn btn-outline-success" type="submit">Update Question</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -46,10 +45,10 @@
     const newOptionDiv = document.createElement('div');
     newOptionDiv.className = 'form-group mb-3';
     newOptionDiv.innerHTML = `
-      <label for="option${optionCount}" class="form-label">Option ${optionCount + 1}</label>
-      <input type="text" id="option${optionCount}" name="options" class="form-control" placeholder="Enter option ${optionCount + 1}" required />
+      <label for="option${optionCount}" class="form-label">Option ${optionCount}</label>
+      <input type="text" id="option${optionCount}" name="options" class="form-control" placeholder="Enter option ${optionCount}" required />
     `;
-
+    
     optionsContainer.appendChild(newOptionDiv);
   });
 </script>

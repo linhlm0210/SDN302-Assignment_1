@@ -35,6 +35,10 @@ export const fetch = async (req, res)=>{
             return res.status(404).json({message : "Question not Found."})
         }
         // res.status(200).json(question);
+        // console.log(question[0].options[question[0].correctAnswerIndex]);
+        question.forEach(item => {
+            item.correctAnswer = item.options[item.correctAnswerIndex];
+        });
         res.render("questions/listQuestions", {
             question: question
         });
@@ -106,14 +110,19 @@ export const update = async (req, res) => {
   };
   
 
-export const updateQuestion = async (req, res) => {
+  export const renderUpdateQuestion = async (req, res) => {
     try {
-      res.render("questions/updateQuestion");
+      const id = req.params.id;
+      const questionExist = await Question.findById(id).lean();
+      if (!questionExist) {
+        return res.status(404).json({ message: "Question not found." });
+      }
+      res.render('questions/updateQuestion', { question: questionExist });
     } catch (error) {
-      console.log("Internal Server Error. ");
-      res.status(500).json({ error: "Internal Server Error. " });
+      console.error("Error fetching question:", error);
+      res.status(500).json({ error: "Internal Server Error." });
     }
-  }
+  };
 
 
   // Render trang update question với dữ liệu hiện tại của câu hỏi
@@ -133,7 +142,7 @@ export const updateQuestion = async (req, res) => {
   };
   
   // Xử lý yêu cầu cập nhật question khi form được submit
-  export const updateQuestion1 = async (req, res) => {
+  export const updateQuestion = async (req, res) => {
       try {
           const id = req.params.id; // Lấy id của câu hỏi từ URL
           const { text, options, correctAnswerIndex, keywords } = req.body; // Lấy dữ liệu từ form
